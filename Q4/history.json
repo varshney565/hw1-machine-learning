@@ -1,0 +1,399 @@
+[
+  {
+    "op": "core/row-removal",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "list",
+          "name": "Common Name",
+          "expression": "isBlank(value)",
+          "columnName": "Common Name",
+          "invert": false,
+          "omitBlank": false,
+          "omitError": false,
+          "selection": [
+            {
+              "v": {
+                "v": true,
+                "l": "true"
+              }
+            }
+          ],
+          "selectBlank": false,
+          "selectError": false
+        }
+      ],
+      "mode": "row-based"
+    },
+    "description": "Remove rows"
+  },
+  {
+    "op": "core/row-removal",
+    "engineConfig": {
+      "facets": [
+        {
+          "type": "text",
+          "name": "Subject",
+          "columnName": "Subject",
+          "query": "Airport",
+          "mode": "text",
+          "caseSensitive": true,
+          "invert": true
+        }
+      ],
+      "mode": "row-based"
+    },
+    "description": "Remove rows"
+  },
+  {
+    "op": "core/column-addition",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "baseColumnName": "Subject",
+    "expression": "grel:with(value, s,\n  with(s.indexOf(\"Airport\"), i,\n    if(i < 0, null, trim(s.substring(0, i + 7)))\n  )\n)",
+    "onError": "set-to-blank",
+    "newColumnName": "Airport",
+    "columnInsertIndex": 5,
+    "description": "Create column Airport at index 5 based on column Subject using expression grel:with(value, s,\n  with(s.indexOf(\"Airport\"), i,\n    if(i < 0, null, trim(s.substring(0, i + 7)))\n  )\n)"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Airport",
+    "expression": "grel:value.replace(/.*\\b(?:at|in|near|from|to|on|of)\\b\\s+/i, \"\")",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Airport using expression grel:value.replace(/.*\\b(?:at|in|near|from|to|on|of)\\b\\s+/i, \"\")"
+  },
+  {
+    "op": "core/text-transform",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Airport",
+    "expression": "grel:value.replace(/\\b(Int'l|Intl\\.?)\\b/,\"International\").replace(/\\s+/,\" \").trim()",
+    "onError": "keep-original",
+    "repeat": false,
+    "repeatCount": 10,
+    "description": "Text transform on cells in column Airport using expression grel:value.replace(/\\b(Int'l|Intl\\.?)\\b/,\"International\").replace(/\\s+/,\" \").trim()"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Airport",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "Shenzhen Bao’an Airport",
+          "Shenzhen Bao'An Airport",
+          "Shenzhen Bao'an Airport",
+          "Shenzhen Baoan Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Shenzhen Bao’an Airport"
+      },
+      {
+        "from": [
+          "OR Tambo International Airport",
+          "O.R Tambo International Airport",
+          "O.R. Tambo International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "OR Tambo International Airport"
+      },
+      {
+        "from": [
+          "Merida International Airport",
+          "Mérida International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Merida International Airport"
+      },
+      {
+        "from": [
+          "Xi'an Xianyang Airport",
+          "Xi’an Xianyang Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Xi'an Xianyang Airport"
+      }
+    ],
+    "description": "Mass edit cells in column Airport"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Airport",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "Amsterdam Schiphol Airport",
+          "Amsterdam-Schiphol Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Amsterdam Schiphol Airport"
+      },
+      {
+        "from": [
+          "Soekarno Hatta Airport",
+          "Soekarno-Hatta Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Soekarno Hatta Airport"
+      },
+      {
+        "from": [
+          "Milan Malpensa Airport",
+          "Milan–Malpensa Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Milan Malpensa Airport"
+      },
+      {
+        "from": [
+          "Tan Son Nhat International Airport",
+          "Tan Son Nha International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Tan Son Nhat International Airport"
+      },
+      {
+        "from": [
+          "Soekarno-Hatta International Airport",
+          "Soekarno Hatta International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Soekarno-Hatta International Airport"
+      }
+    ],
+    "description": "Mass edit cells in column Airport"
+  },
+  {
+    "op": "core/mass-edit",
+    "engineConfig": {
+      "facets": [],
+      "mode": "row-based"
+    },
+    "columnName": "Airport",
+    "expression": "value",
+    "edits": [
+      {
+        "from": [
+          "Shenyang Taoxian Airport",
+          "Shenyang Taoxian International Airport",
+          "Shenyang Taoxin International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Shenyang Taoxian Airport"
+      },
+      {
+        "from": [
+          "Murtala Mohammed Airport",
+          "Murtala Muhammed Airport",
+          "Murtala Muhammed International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Murtala Mohammed Airport"
+      },
+      {
+        "from": [
+          "Amsterdam Schiphol Airport",
+          "Amsterdam Schipol Airport",
+          "Amsterdam-Schiphol International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Amsterdam Schiphol Airport"
+      },
+      {
+        "from": [
+          "Bangkok Suvarnabhumi Airport",
+          "Bangkok Suvarnbhumi Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Bangkok Suvarnabhumi Airport"
+      },
+      {
+        "from": [
+          "Sultan Aji Muhammad Sulaiman Airport",
+          "Sultan Aji Muhammad Sulaiman Sepinggan International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Sultan Aji Muhammad Sulaiman Airport"
+      },
+      {
+        "from": [
+          "Kunming Changshui Airport",
+          "Kunming Changshui International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Kunming Changshui Airport"
+      },
+      {
+        "from": [
+          "Qingdao Liuting Airport",
+          "Qingdao Liuting International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Qingdao Liuting Airport"
+      },
+      {
+        "from": [
+          "Guangzhou Baiyun Airport",
+          "Gunagzhou Baiyun Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Guangzhou Baiyun Airport"
+      },
+      {
+        "from": [
+          "Berlin Schoenefeld Airport",
+          "Berlin Schonefeld Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Berlin Schoenefeld Airport"
+      },
+      {
+        "from": [
+          "Sultan Hasanuddin Airport",
+          "​​Sultan Hasanuddin Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Sultan Hasanuddin Airport"
+      },
+      {
+        "from": [
+          "Hangzhou Xiaoshan Airport",
+          "Hangzhou Xiaoshan International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Hangzhou Xiaoshan Airport"
+      },
+      {
+        "from": [
+          "Chongqing Jiangbei Airport",
+          "Chongqing Jiangbei International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Chongqing Jiangbei Airport"
+      },
+      {
+        "from": [
+          "Lanzhou Zhongchuan Airport",
+          "Lanzhou Zhongchuan International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Lanzhou Zhongchuan Airport"
+      },
+      {
+        "from": [
+          "Beijing Capital Airport",
+          "Beijing Capital International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Beijing Capital Airport"
+      },
+      {
+        "from": [
+          "Sultan Syarif Kasim II Airport",
+          "Sultan Syarif Kasim II International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Sultan Syarif Kasim II Airport"
+      },
+      {
+        "from": [
+          "Chengdu Shuangliu Airport",
+          "Chengdu Shuangliu International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Chengdu Shuangliu Airport"
+      },
+      {
+        "from": [
+          "Chhatrapati Shivaji Maharaj International Airport",
+          "Chhatrapati Shivaji International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Chhatrapati Shivaji Maharaj International Airport"
+      },
+      {
+        "from": [
+          "Changsha Airport",
+          "Changshui Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Changsha Airport"
+      },
+      {
+        "from": [
+          "Bandaranaike International Airport",
+          "Bandaranayake International Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Bandaranaike International Airport"
+      },
+      {
+        "from": [
+          "Maputo International Airport",
+          "Maputo Interantional Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Maputo International Airport"
+      },
+      {
+        "from": [
+          "Karlsruhe-Baden-Baden International Airport",
+          "Karlsruhe/Baden-Baden Airport"
+        ],
+        "fromBlank": false,
+        "fromError": false,
+        "to": "Karlsruhe-Baden-Baden International Airport"
+      }
+    ],
+    "description": "Mass edit cells in column Airport"
+  }
+]
