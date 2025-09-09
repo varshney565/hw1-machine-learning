@@ -1,83 +1,139 @@
+<!--
+  run 
+    1 ) python -m http.server 8000
+    2 ) open http://localhost:8000/Q3.html in browser
+-->
 <!DOCTYPE html>
-<!-- cse6242 -->
-
-<!-- run: http-server & -->
 
 <head>
-  <style>    
-    /* Define css rules here */
+  <meta charset="utf-8" />
+  <title>Wildlife Trafficking Incidents per Species (2015 to 2023)</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    svg text { font-size: 12px; }
+    .axis path, .axis line { stroke: #777; shape-rendering: crispEdges; }
+    .bar { shape-rendering: crispEdges; }
   </style>
-<title></title>
 </head>
 
 <body>
-
   <script src="lib/d3/d3.min.js"></script>
   <script src="lib/d3-dsv/d3-dsv.min.js"></script>
   <script src="lib/d3-fetch/d3-fetch.min.js"></script>
 
-
   <script>
-    // define the dimensions and margins for the graph
-    var margin;
-    var width;
-    var height;
+    const GT_USERNAME = "vidushi"; 
 
+    // 1) fixed thickness bars + spacing via scaleBand padding
+    const margin = { top: 60, right: 20, bottom: 80, left: 170 };
+    const width  = 900 - margin.left - margin.right;
+    const height = 370 - margin.top  - margin.bottom;
 
-    // create scales x & y for X and Y axis and set their ranges
-    var x;
-    var y;
+    // 4) X = Count (linear). 5) Y = Species (categorical, top-5)
+    const x = d3.scaleLinear().range([0, width]);
+    const y = d3.scaleBand().range([0, height]).padding(0.2);
 
+    // svg + container
+    const svg = d3.select("body").append("svg")
+      .attr("id", "svg1")                   
+      .attr("width",  width  + margin.left + margin.right)
+      .attr("height", height + margin.top  + margin.bottom)
+      .append("g")
+      .attr("id", "container")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // append svg element to the body of the page
-    var svg = d3.select("body").append("svg")
-	   	// set the id, dimensions and position of the svg element 	
-	    .append("g")
-	    .attr("id", "container");
+    // 8) colorblind-safe unique colors (Okabe–Ito)
+    const color = d3.scaleOrdinal()
+      .range(["#0072B2","#E69F00","#009E73","#D55E00","#CC79A7","#56B4E9","#F0E442","#999999"]);
 
+    const pathToCsv = "q3.csv";
 
-    // Get the data and filter for top 5 most trafficked species
-	  var pathToCsv = "q3.csv";		// path to csv
-	
-    d3.dsv(",", pathToCsv, function (d) {
-      return {
-        // format data attributes if required
-      }
-    }).then(function (data) {
-      console.log(data); // you should see the data in your browser's developer tools console 
-      
-      /* Create bar plot using data from csv */
+    d3.dsv(",", pathToCsv, d => ({ species: d.species, count: +d.count }))
+      .then(data => {
+        // sort desc by count & keep top 5
+        data.sort((a, b) => d3.descending(a.count, b.count));
+        const top5 = data.slice(0, 5);
 
-      // set the domains of X and Y scales based on data
-      x.domain();
-      y.domain();
+        // domains
+        const maxCount = d3.max(top5, d => d.count) || 0;
+        const maxTick  = Math.ceil(maxCount / 500) * 500;   // 4) ticks every 500
+        x.domain([0, maxTick]);
+        y.domain(top5.map(d => d.species));
 
-      // Add bars to svg - create new elements based on your data
-      svg.selectAll()
+        // --- bars group ---
+        const barsG = svg.append("g").attr("id", "bars");
 
+        barsG.selectAll("rect")
+          .data(top5)
+          .enter()
+          .append("rect")
+            .attr("class", "bar")
+            .attr("y", d => y(d.species))
+            .attr("x", 0)
+            .attr("height", y.bandwidth())           // fixed thickness
+            .attr("width",  d => x(d.count))
+            .attr("fill",   d => color(d.species));  // 8) unique colors
 
-      // Add the X Axis
-      svg.append()
+        // --- X axis (bottom) ---
+        const xAxis = d3.axisBottom(x)
+          .tickValues(d3.range(0, maxTick + 1, 500)) // 4) every 500
+          .tickFormat(d3.format(",d"));
 
-      // Add the text label for X Axis
-      svg.append()
+        svg.append("g")
+          .attr("id", "x_axis")
+          .attr("class", "axis")
+          .attr("transform", `translate(0,${height})`)
+          .call(xAxis);
 
-      // Add the Y Axis
-      svg.append()
+        // 3) X-axis label text + id
+        svg.append("text")
+          .attr("id", "x_axis_label")
+          .attr("x", width / 2)
+          .attr("y", height + 50)
+          .attr("text-anchor", "middle")
+          .text("Count");
 
-      // Add the text label for Y axis
-      svg.append()
+        // --- Y axis (left) ---
+        const yAxis = d3.axisLeft(y);
 
-      // Add GT username
-      svg.append()
+        svg.append("g")
+          .attr("id", "y_axis")
+          .attr("class", "axis")
+          .call(yAxis);
 
-      // Add Title
-      svg.append()
+        // 3) Y-axis label text + id
+        svg.append("text")
+          .attr("id", "y_axis_label")
+          .attr("transform", "rotate(-90)")
+          .attr("x", -height / 2)
+          .attr("y", -margin.left + 20)
+          .attr("text-anchor", "middle")
+          .text("Species");
 
+        // 7) username at bottom-right beneath plot
+        svg.append("text")
+          .attr("id", "credit")
+          .attr("x", width)
+          .attr("y", height + 70)
+          .attr("text-anchor", "end")
+          .style("fill", "#444")
+          .text(`${GT_USERNAME}`);
 
-    }).catch(function (error) {
-      console.log(error);
-    });
-
+        // 6) in-chart title with exact wording + id (above plot)
+        svg.append("text")
+          .attr("id", "title")
+          .attr("x", width / 2)
+          .attr("y", -20)
+          .attr("text-anchor", "middle")
+          .style("font-size", "16px")
+          .style("font-weight", "600")
+          .text("Wildlife Trafficking Incidents per Species (2015 to 2023)");
+      })
+      .catch(err => {
+        console.error(err);
+        svg.append("text").attr("x", 0).attr("y", 0).text("Error loading q3.csv");
+      });
   </script>
 </body>
+
+
