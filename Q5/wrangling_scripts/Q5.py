@@ -8,40 +8,27 @@ import csv
 
 
 def username():
-    return 'gburdell3'
+    return '</>'
 
 
-def data_wrangling(filter_class: str = None):
-    """
-    Args:
-        - filter_class (str): Optional parameter that specifies the animal class
-            to filter the data for.
-    """
-    with open('data/q5.csv', 'r', encoding='utf-8') as f:
-        reader = csv.reader(f)
-        table = list()
-        # Feel free to add any additional variables
-        ...
-        
-        # Read in the header
-        for header in reader:
-            break
-        
-        # Read in each row
-        for row in reader:
-            row_data = [row[0], row[1], int(row[2])]
-            table.append(row_data)
-        
-        # Programmatically get unique classes and sort alphabetically for dropdown - [2 point] Q5.4.a
-        dropdown_options = []
-        
-        # Filter, sort, and limit the table - [3 points] Q5.4.b
-        # Filter the data by the class column (second column)
-        if filter_class:
-            ...
-        # Order table by the count column (last column) - don't need to worry about tiebreaks
-        ...
-        # Take only the first 10 rows
-        ...
-    
-    return header, table, dropdown_options
+def data_wrangling(filter_class: str = ""):
+    import csv, os
+    here = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.normpath(os.path.join(here, "..", "data", "q5.csv"))
+
+    rows = []
+    with open(path, "r", encoding="utf-8", newline="") as f:
+        rdr = csv.DictReader(f)
+        for r in rdr:
+            try:
+                c = int(str(r["count"]).strip())
+            except Exception:
+                continue 
+            rows.append([r["species"], r["class"], c])
+    option_list = sorted({klass for _, klass, _ in rows})
+    data = [rec for rec in rows if (not filter_class or rec[1] == filter_class)]
+    data.sort(key=lambda rec: rec[2], reverse=True)
+    top10 = data[:10]
+    header = ["species", "class", "count"]
+    table = [[sp, klass, str(cnt)] for sp, klass, cnt in top10]
+    return header, table, option_list
