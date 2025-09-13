@@ -56,8 +56,7 @@
 
         // domains
         const maxCount = d3.max(top5, d => d.count) || 0;
-        const maxTick  = Math.ceil(maxCount / 500) * 500;   // 4) ticks every 500
-        x.domain([0, maxTick]);
+        x.domain([0, maxCount]);
         y.domain(top5.map(d => d.species));
 
         // --- bars group ---
@@ -75,9 +74,15 @@
             .attr("fill",   d => color(d.species));  // 8) unique colors
 
         // --- X axis (bottom) ---
+        const base = Math.floor(maxCount / 500) * 500;
+        const ticks = d3.range(0, base + 1, 500);
+        if (maxCount % 500 !== 0 || ticks.length === 0) ticks.push(maxCount);
+
         const xAxis = d3.axisBottom(x)
-          .tickValues(d3.range(0, maxTick + 1, 500)) // 4) every 500
+          .tickValues(ticks)
           .tickFormat(d3.format(",d"));
+
+
 
         svg.append("g")
           .attr("id", "x_axis")
